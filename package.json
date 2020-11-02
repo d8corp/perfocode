@@ -32,10 +32,12 @@
     "url": "https://github.com/d8corp/perfocode/issues"
   },
   "homepage": "https://github.com/d8corp/perfocode",
+  "dependencies": {
+    "colors": "^1.4.0"
+  },
   "devDependencies": {
     "@types/colors": "^1.2.1",
     "@types/jest": "^26.0.15",
-    "colors": "^1.4.0",
     "core-js": "^3.6.5",
     "jest": "^26.6.1",
     "rimraf": "^3.0.2",
