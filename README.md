@@ -40,7 +40,9 @@ perfocode('output-file', () => {
 ```
 `perfocode` creates JSON file with results of testing.  
 Any next running will compare with the file, show the difference and save new results.  
-You can run `describe` and `test` anywhere.
+You can run `describe` and `test` anywhere.  
+
+![](https://raw.githubusercontent.com/d8corp/perfocode/main/1.png)  
 
 You can change testing timeout by 3rd argument of `perfocode`, `describe` and `test`
 ```javascript
