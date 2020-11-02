@@ -1,0 +1,27 @@
+{
+  "name": "perfocode",
+  "version": "1.0.0",
+  "description": "Performance checker",
+  "main": "index.js",
+  "module": "index.es6.js",
+  "jsnext:main": "index.es6.js",
+  "types": "index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/d8corp/perfocode.git"
+  },
+  "keywords": [
+    "performance",
+    "code",
+    "perfect",
+    "test",
+    "describe",
+    "front-end"
+  ],
+  "author": "Mikhail Lysikov <d8corp@mail.ru>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/d8corp/perfocode/issues"
+  },
+  "homepage": "https://github.com/d8corp/perfocode"
+}
