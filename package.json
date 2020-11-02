@@ -1,6 +1,6 @@
 {
   "name": "perfocode",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Performance checker",
   "main": "index.js",
   "module": "index.es6.js",
