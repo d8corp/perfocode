@@ -71,12 +71,12 @@ perfocode('output-file', () => {
   describe('getters vs methods', () => {
     class GetterVsMethod {
       constructor () {
-        for (let i = 0; i < 1000;) {
-          i++
-        }
         this._value = 0
       }
       get value () {
+        for (let i = 0; i < 1000;) {
+          i++
+        }
         return this._value
       }
       getValue () {
