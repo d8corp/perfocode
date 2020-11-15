@@ -7,13 +7,14 @@ The simplest performance checker.
 ### Installation
 npm
 ```bash
-npm i perfocode
+npm i perfocode -D
 ```
 yarn
 ```bash
-yarn add perfocode
+yarn add perfocode -D
 ```
 ### Using
+Create `index.js` with the next code.
 ```javascript
 const {perfocode, describe, test} = require('perfocode')
 
@@ -38,6 +39,26 @@ perfocode('output-file', () => {
   })
 })
 ```
+Run the file.
+```bash
+node index.js
+```
+When a compare file does not exist you will see only current results.
+
+![](https://raw.githubusercontent.com/d8corp/perfocode/main/1.png)
+
+Press `enter` if you wanna save the results to `output-file.json`.  
+
+Run the test again, and you will see the difference.
+
+![](https://raw.githubusercontent.com/d8corp/perfocode/main/2.png)
+
+more or less
+
+![](https://raw.githubusercontent.com/d8corp/perfocode/main/3.png)
+![](https://raw.githubusercontent.com/d8corp/perfocode/main/4.png)
+![](https://raw.githubusercontent.com/d8corp/perfocode/main/5.png)
+
 `perfocode` creates JSON file with results of testing.  
 Any next running will compare with the file, show the difference and save new results.  
 You can run `describe` and `test` anywhere.  

@@ -1,16 +1,14 @@
 import scope from './scope'
 import performance from './performance'
 import getDeep from './getDeep'
-import colors from 'colors'
+import chalk from 'chalk'
+
+export function beautifyNumber (num: number, decimal = 4) {
+  return parseFloat(num.toFixed(decimal))
+}
 
 function test (test: string, callback: () => any, timeout = scope.currentTimeout) {
   const value = performance(callback, timeout)
-  let minColor = colors.gray
-  let maxColor = colors.gray
-  let beforeMin = ''
-  let beforeMax = ''
-  let afterMin = ''
-  let afterMax = ''
   let object = scope.result
   for (const name of scope.deep) {
     if (!(name in object)) {
@@ -22,23 +20,50 @@ function test (test: string, callback: () => any, timeout = scope.currentTimeout
   if (deepPrefix) {
     deepPrefix = deepPrefix.slice(0, -1) + '╞'
   }
+  function log (result: string | number, average?: number) {
+    console.log(`${deepPrefix} ${chalk.yellow(test)}${average ? ` [${chalk.yellow(beautifyNumber(average))}]` : ''}: ${result}`)
+  }
   if (test in object) {
-    if (value < object[test].min) {
-      minColor = colors.red
-      beforeMin = colors.gray(object[test].min + ' < ')
+    const {min, max} = object[test]
+    const averageValue = object[test].value = (object[test].value + value) / 2
+
+    if (value < min) {
+      const level = ((min - value) * 10 / min) | 0
+      let arrow = '<'
+      for (let i = 0; i < level; i++) {
+        arrow += '<'
+      }
+      if (min === max) {
+        log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)}`)}`, averageValue)
+      } else {
+        log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)} < ${beautifyNumber(max)}`)}`, averageValue)
+      }
       object[test].min = value
-    } else if (value > object[test].max) {
-      maxColor = colors.green
-      beforeMax = colors.gray(' > ' + object[test].max)
+    } else if (value > max) {
       object[test].max = value
+      const level = ((value - max) * 10 / value) | 0
+      let arrow = '<'
+      for (let i = 0; i < level; i++) {
+        arrow += '<'
+      }
+      if (min === max) {
+        log(`${chalk.gray(beautifyNumber(min))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue)
+      } else {
+        log(`${chalk.gray(beautifyNumber(min) + ' < ' + beautifyNumber(max))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue)
+      }
+    } else if (min === max) {
+      log(beautifyNumber(value))
+    } else {
+      log(`${chalk.gray(beautifyNumber(min) + ' <')} ${beautifyNumber(value)} ${chalk.gray('< ' + beautifyNumber(max))}`, averageValue)
     }
-    console.log(`${deepPrefix} ${test}: ${minColor(`${object[test].min} < `)}${beforeMin}${value}${beforeMax}${maxColor(` > ${object[test].max}`)}`)
   } else {
     object[test] = {
       min: value,
       max: value,
+      value,
     }
-    console.log(`${deepPrefix} ${test}: ${value}`)
+
+    log(beautifyNumber(value))
   }
 }
 
