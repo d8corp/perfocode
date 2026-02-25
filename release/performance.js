@@ -5,7 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var scope = require('./scope.js');
 
 function performance(callback, ms) {
-    if (ms === void 0) { ms = scope['default'].currentTimeout; }
+    if (ms === void 0) { ms = scope["default"].currentTimeout; }
     var count = 0;
     var endTime = Date.now() + ms;
     do {
@@ -15,5 +15,5 @@ function performance(callback, ms) {
     return count / ms;
 }
 
-exports.default = performance;
+exports["default"] = performance;
 exports.performance = performance;

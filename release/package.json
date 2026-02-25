@@ -1,11 +1,18 @@
 {
   "name": "perfocode",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Performance checker",
   "main": "index.js",
   "module": "index.es6.js",
   "jsnext:main": "index.es6.js",
   "types": "index.d.ts",
+  "scripts": {
+    "build": "innetjs release",
+    "release": "innetjs release -p",
+    "patch": "innetjs patch",
+    "minor": "innetjs minor",
+    "major": "innetjs major"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/d8corp/perfocode.git"

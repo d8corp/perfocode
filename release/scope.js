@@ -8,5 +8,5 @@ var scope = {
     result: {}
 };
 
-exports.default = scope;
+exports["default"] = scope;
 exports.scope = scope;

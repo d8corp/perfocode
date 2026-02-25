@@ -1,15 +1,16 @@
-import fs from 'fs';
+import fs from 'node:fs';
 import scope from './scope.es6.js';
-import { createInterface } from 'readline';
+import { createInterface } from 'node:readline';
 import chalk from 'chalk';
 
-function perfocode(output, callback, timeout = scope.currentTimeout) {
+function perfocode(output, callback, timeout) {
+    if (timeout === void 0) { timeout = scope.currentTimeout; }
     scope.currentTimeout = timeout;
-    const readline1 = createInterface({
+    var readline1 = createInterface({
         input: process.stdin,
         output: process.stdout
     });
-    readline1.question(`Compare with [${chalk.cyan(output)}]: `, newOutput => {
+    readline1.question("Compare with [".concat(chalk.cyan(output), "]: "), function (newOutput) {
         if (newOutput) {
             output = newOutput;
         }
@@ -19,13 +20,13 @@ function perfocode(output, callback, timeout = scope.currentTimeout) {
         }
         catch (e) { }
         callback();
-        const readline2 = createInterface({
+        var readline2 = createInterface({
             input: process.stdin,
             output: process.stdout
         });
-        readline2.question(`Do you want to save results? [${chalk.cyan('Y')}/${chalk.red('n')}]: `, save => {
+        readline2.question("Do you want to save results? [".concat(chalk.cyan('Y'), "/").concat(chalk.red('n'), "]: "), function (save) {
             if (!save || save !== 'n') {
-                readline2.question(`File name. [${chalk.cyan(output)}]: `, file => {
+                readline2.question("File name. [".concat(chalk.cyan(output), "]: "), function (file) {
                     fs.writeFileSync((file || output) + '.json', JSON.stringify(scope.result, null, 2));
                     readline2.close();
                 });
@@ -37,5 +38,4 @@ function perfocode(output, callback, timeout = scope.currentTimeout) {
     });
 }
 
-export default perfocode;
-export { perfocode };
+export { perfocode as default, perfocode };

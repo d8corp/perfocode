@@ -1,8 +1,7 @@
-const scope = {
+var scope = {
     currentTimeout: 200,
     deep: [],
     result: {}
 };
 
-export default scope;
-export { scope };
+export { scope as default, scope };
