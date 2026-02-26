@@ -1,5 +1,6 @@
-export { default } from './perfocode';
-export { perfocode } from './perfocode';
-export { describe } from './describe';
-export { test } from './test';
-export { performance } from './performance';
+export * from './describe';
+export * from './perfocode';
+export * from './scope';
+export * from './test';
+export * from './type';
+export * from './utils';

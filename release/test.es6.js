@@ -1,87 +1,81 @@
-import { __values } from 'tslib';
-import scope from './scope.es6.js';
-import performance from './performance.es6.js';
-import getDeep from './getDeep.es6.js';
 import chalk from 'chalk';
+import { scope } from './scope.es6.js';
+import './utils/index.es6.js';
+import { getCurrentResult } from './utils/getCurrentResult/getCurrentResult.es6.js';
+import { getPrefix } from './utils/getPrefix/getPrefix.es6.js';
+import { performance } from './utils/performance/performance.es6.js';
 
-function beautifyNumber(num, decimal) {
-    if (decimal === void 0) { decimal = 4; }
+function beautifyNumber(num, decimal = 4) {
     return parseFloat(num.toFixed(decimal));
 }
-function test(test, callback, timeout) {
-    var e_1, _a;
-    if (timeout === void 0) { timeout = scope.currentTimeout; }
-    var value = performance(callback, timeout);
-    var object = scope.result;
-    try {
-        for (var _b = __values(scope.deep), _c = _b.next(); !_c.done; _c = _b.next()) {
-            var name_1 = _c.value;
-            if (!(name_1 in object)) {
-                object[name_1] = {};
-            }
-            object = object[name_1];
-        }
+function test(test, callback, timeout = scope) {
+    const options = Object.assign({}, scope, typeof timeout === 'number' ? { timeout } : timeout);
+    let value = 0;
+    const object = getCurrentResult(scope);
+    const deepPrefix = getPrefix().slice(0, -1) + '╞';
+    if (options.throwError) {
+        value = performance(callback, options.timeout);
     }
-    catch (e_1_1) { e_1 = { error: e_1_1 }; }
-    finally {
+    else {
         try {
-            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            value = performance(callback, options.timeout);
         }
-        finally { if (e_1) throw e_1.error; }
-    }
-    var deepPrefix = getDeep();
-    if (deepPrefix) {
-        deepPrefix = deepPrefix.slice(0, -1) + '╞';
+        catch (e) {
+            console.log(`${deepPrefix} ${chalk.red(`${test}: Error (${e.message ?? e})`)}`);
+            scope.errors++;
+            return;
+        }
     }
     function log(result, average) {
-        console.log("".concat(deepPrefix, " ").concat(chalk.yellow(test)).concat(average ? " [".concat(chalk.yellow(beautifyNumber(average)), "]") : '', ": ").concat(result));
+        console.log(`${deepPrefix} ${chalk.yellow(test)}${average ? ` [${chalk.yellow(beautifyNumber(average))}]` : ''}: ${result}`);
     }
     if (test in object) {
-        var _d = object[test], min = _d.min, max = _d.max;
-        var averageValue = object[test].value = (object[test].value + value) / 2;
+        const { min, max } = object[test];
+        const averageValue = object[test].value = (object[test].value + value) / 2;
         if (value < min) {
-            var level = ((min - value) * 10 / min) | 0;
-            var arrow = '<';
-            for (var i = 0; i < level; i++) {
+            const level = ((min - value) * 10 / min) | 0;
+            let arrow = '<';
+            for (let i = 0; i < level; i++) {
                 arrow += '<';
             }
             if (min === max) {
-                log("".concat(chalk.red("".concat(beautifyNumber(value), " ").concat(arrow)), " ").concat(chalk.gray("".concat(beautifyNumber(min)))), averageValue);
+                log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)}`)}`, averageValue);
             }
             else {
-                log("".concat(chalk.red("".concat(beautifyNumber(value), " ").concat(arrow)), " ").concat(chalk.gray("".concat(beautifyNumber(min), " < ").concat(beautifyNumber(max)))), averageValue);
+                log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)} < ${beautifyNumber(max)}`)}`, averageValue);
             }
             object[test].min = value;
         }
         else if (value > max) {
             object[test].max = value;
-            var level = ((value - max) * 10 / value) | 0;
-            var arrow = '<';
-            for (var i = 0; i < level; i++) {
+            const level = ((value - max) * 10 / value) | 0;
+            let arrow = '<';
+            for (let i = 0; i < level; i++) {
                 arrow += '<';
             }
             if (min === max) {
-                log("".concat(chalk.gray(beautifyNumber(min)), " ").concat(chalk.green(arrow + " ".concat(beautifyNumber(value)))), averageValue);
+                log(`${chalk.gray(beautifyNumber(min))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue);
             }
             else {
-                log("".concat(chalk.gray(beautifyNumber(min) + ' < ' + beautifyNumber(max)), " ").concat(chalk.green(arrow + " ".concat(beautifyNumber(value)))), averageValue);
+                log(`${chalk.gray(beautifyNumber(min) + ' < ' + beautifyNumber(max))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue);
             }
         }
         else if (min === max) {
             log(beautifyNumber(value));
         }
         else {
-            log("".concat(chalk.gray(beautifyNumber(min) + ' <'), " ").concat(beautifyNumber(value), " ").concat(chalk.gray('< ' + beautifyNumber(max))), averageValue);
+            log(`${chalk.gray(beautifyNumber(min) + ' <')} ${beautifyNumber(value)} ${chalk.gray('< ' + beautifyNumber(max))}`, averageValue);
         }
     }
     else {
         object[test] = {
             min: value,
             max: value,
-            value: value,
+            value,
         };
         log(beautifyNumber(value));
     }
+    global.gc?.();
 }
 
-export { beautifyNumber, test as default, test };
+export { beautifyNumber, test };

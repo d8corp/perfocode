@@ -1,3 +1,2 @@
-declare function perfocode(output: string, callback: () => any, timeout?: number): void;
-export default perfocode;
-export { perfocode };
+import type { Callback, TimeoutOption } from './type';
+export declare function perfocode(output: string, callback: Callback, timeout?: TimeoutOption): void;

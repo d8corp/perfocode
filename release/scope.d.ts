@@ -1,7 +1,2 @@
-declare const scope: {
-    currentTimeout: number;
-    deep: any[];
-    result: {};
-};
-export default scope;
-export { scope };
+import type { Scope } from './type';
+export declare const scope: Scope;

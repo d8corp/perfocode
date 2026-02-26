@@ -1,4 +1,10 @@
-export { default, default as perfocode } from './perfocode.es6.js';
-export { default as describe } from './describe.es6.js';
-export { default as test } from './test.es6.js';
-export { default as performance } from './performance.es6.js';
+export { describe } from './describe.es6.js';
+export { perfocode } from './perfocode.es6.js';
+export { scope } from './scope.es6.js';
+export { beautifyNumber, test } from './test.es6.js';
+import './type.es6.js';
+import './utils/index.es6.js';
+export { getCurrentResult } from './utils/getCurrentResult/getCurrentResult.es6.js';
+export { getPrefix } from './utils/getPrefix/getPrefix.es6.js';
+export { getProgressColor } from './utils/getProgressColor/getProgressColor.es6.js';
+export { performance } from './utils/performance/performance.es6.js';

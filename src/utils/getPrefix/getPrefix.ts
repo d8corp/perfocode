@@ -1,9 +1,11 @@
-import {scope} from './scope'
+import { scope } from '../../scope'
 
-export default function getDeep (): string {
+export function getPrefix (): string {
   let result = ''
+
   for (let i = 0; i < scope.deep.length; i++) {
     result += '│'
   }
+
   return result
 }

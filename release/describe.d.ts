@@ -1,3 +1,2 @@
-declare function describe(name: string, callback: () => any, timeout?: number): void;
-export default describe;
-export { describe };
+import type { Callback, TimeoutOption } from './type';
+export declare function describe(name: string, callback: Callback, timeout?: TimeoutOption): void;
