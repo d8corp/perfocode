@@ -2,7 +2,7 @@ import chalk from 'chalk'
 
 import { scope } from './scope'
 import type { Callback, TimeoutOption } from './type'
-import { getCurrentResult, getPrefix, performance } from './utils'
+import { getCurrentResult, getDeltaColor, getPrefix, performance } from './utils'
 
 export function beautifyNumber (num: number, decimal = 4) {
   return parseFloat(num.toFixed(decimal))
@@ -29,13 +29,16 @@ export function test (test: string, callback: Callback, timeout: TimeoutOption =
     }
   }
 
-  function log (result: string | number, average?: number) {
-    console.log(`${deepPrefix} ${chalk.yellow(test)}${average ? ` [${chalk.yellow(beautifyNumber(average))}]` : ''}: ${result}`)
+  function log (result: string | number, average?: number, delta?: number) {
+    console.log(`${deepPrefix} ${chalk.yellow(test)}${average ? ` [${chalk.yellow(beautifyNumber(average))}]` : ''}: ${result}${delta ? getDeltaColor(delta, ` (Δ ${beautifyNumber(delta, 2)}%)`) : ''}`)
   }
 
   if (test in object) {
     const { min, max } = object[test]
     const averageValue = object[test].value = (object[test].value + value) / 2
+    const currentMin = Math.min(min, value)
+    const currentMax = Math.max(min, value)
+    const delta = (currentMax - currentMin) / currentMax * 100
 
     if (value < min) {
       const level = ((min - value) * 10 / min) | 0
@@ -46,9 +49,9 @@ export function test (test: string, callback: Callback, timeout: TimeoutOption =
       }
 
       if (min === max) {
-        log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)}`)}`, averageValue)
+        log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)}`)}`, averageValue, delta)
       } else {
-        log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)} < ${beautifyNumber(max)}`)}`, averageValue)
+        log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)} < ${beautifyNumber(max)}`)}`, averageValue, delta)
       }
 
       object[test].min = value
@@ -62,14 +65,14 @@ export function test (test: string, callback: Callback, timeout: TimeoutOption =
       }
 
       if (min === max) {
-        log(`${chalk.gray(beautifyNumber(min))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue)
+        log(`${chalk.gray(beautifyNumber(min))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue, delta)
       } else {
-        log(`${chalk.gray(beautifyNumber(min) + ' < ' + beautifyNumber(max))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue)
+        log(`${chalk.gray(beautifyNumber(min) + ' < ' + beautifyNumber(max))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue, delta)
       }
     } else if (min === max) {
       log(beautifyNumber(value))
     } else {
-      log(`${chalk.gray(beautifyNumber(min) + ' <')} ${beautifyNumber(value)} ${chalk.gray('< ' + beautifyNumber(max))}`, averageValue)
+      log(`${chalk.gray(beautifyNumber(min) + ' <')} ${beautifyNumber(value)} ${chalk.gray('< ' + beautifyNumber(max))}`, averageValue, delta)
     }
   } else {
     object[test] = {

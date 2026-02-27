@@ -5,6 +5,7 @@ export { beautifyNumber, test } from './test.es6.js';
 import './type.es6.js';
 import './utils/index.es6.js';
 export { getCurrentResult } from './utils/getCurrentResult/getCurrentResult.es6.js';
+export { getDeltaColor } from './utils/getDeltaColor/getDeltaColor.es6.js';
 export { getPrefix } from './utils/getPrefix/getPrefix.es6.js';
 export { getProgressColor } from './utils/getProgressColor/getProgressColor.es6.js';
 export { performance } from './utils/performance/performance.es6.js';

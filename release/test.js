@@ -8,6 +8,7 @@ require('./utils/index.js');
 var getCurrentResult = require('./utils/getCurrentResult/getCurrentResult.js');
 var getPrefix = require('./utils/getPrefix/getPrefix.js');
 var performance = require('./utils/performance/performance.js');
+var getDeltaColor = require('./utils/getDeltaColor/getDeltaColor.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -34,12 +35,15 @@ function test(test, callback, timeout = scope.scope) {
             return;
         }
     }
-    function log(result, average) {
-        console.log(`${deepPrefix} ${chalk__default["default"].yellow(test)}${average ? ` [${chalk__default["default"].yellow(beautifyNumber(average))}]` : ''}: ${result}`);
+    function log(result, average, delta) {
+        console.log(`${deepPrefix} ${chalk__default["default"].yellow(test)}${average ? ` [${chalk__default["default"].yellow(beautifyNumber(average))}]` : ''}: ${result}${delta ? getDeltaColor.getDeltaColor(delta, ` (Δ ${beautifyNumber(delta, 2)}%)`) : ''}`);
     }
     if (test in object) {
         const { min, max } = object[test];
         const averageValue = object[test].value = (object[test].value + value) / 2;
+        const currentMin = Math.min(min, value);
+        const currentMax = Math.max(min, value);
+        const delta = (currentMax - currentMin) / currentMax * 100;
         if (value < min) {
             const level = ((min - value) * 10 / min) | 0;
             let arrow = '<';
@@ -47,10 +51,10 @@ function test(test, callback, timeout = scope.scope) {
                 arrow += '<';
             }
             if (min === max) {
-                log(`${chalk__default["default"].red(`${beautifyNumber(value)} ${arrow}`)} ${chalk__default["default"].gray(`${beautifyNumber(min)}`)}`, averageValue);
+                log(`${chalk__default["default"].red(`${beautifyNumber(value)} ${arrow}`)} ${chalk__default["default"].gray(`${beautifyNumber(min)}`)}`, averageValue, delta);
             }
             else {
-                log(`${chalk__default["default"].red(`${beautifyNumber(value)} ${arrow}`)} ${chalk__default["default"].gray(`${beautifyNumber(min)} < ${beautifyNumber(max)}`)}`, averageValue);
+                log(`${chalk__default["default"].red(`${beautifyNumber(value)} ${arrow}`)} ${chalk__default["default"].gray(`${beautifyNumber(min)} < ${beautifyNumber(max)}`)}`, averageValue, delta);
             }
             object[test].min = value;
         }
@@ -62,17 +66,17 @@ function test(test, callback, timeout = scope.scope) {
                 arrow += '<';
             }
             if (min === max) {
-                log(`${chalk__default["default"].gray(beautifyNumber(min))} ${chalk__default["default"].green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue);
+                log(`${chalk__default["default"].gray(beautifyNumber(min))} ${chalk__default["default"].green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue, delta);
             }
             else {
-                log(`${chalk__default["default"].gray(beautifyNumber(min) + ' < ' + beautifyNumber(max))} ${chalk__default["default"].green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue);
+                log(`${chalk__default["default"].gray(beautifyNumber(min) + ' < ' + beautifyNumber(max))} ${chalk__default["default"].green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue, delta);
             }
         }
         else if (min === max) {
             log(beautifyNumber(value));
         }
         else {
-            log(`${chalk__default["default"].gray(beautifyNumber(min) + ' <')} ${beautifyNumber(value)} ${chalk__default["default"].gray('< ' + beautifyNumber(max))}`, averageValue);
+            log(`${chalk__default["default"].gray(beautifyNumber(min) + ' <')} ${beautifyNumber(value)} ${chalk__default["default"].gray('< ' + beautifyNumber(max))}`, averageValue, delta);
         }
     }
     else {

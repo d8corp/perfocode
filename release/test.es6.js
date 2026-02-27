@@ -4,6 +4,7 @@ import './utils/index.es6.js';
 import { getCurrentResult } from './utils/getCurrentResult/getCurrentResult.es6.js';
 import { getPrefix } from './utils/getPrefix/getPrefix.es6.js';
 import { performance } from './utils/performance/performance.es6.js';
+import { getDeltaColor } from './utils/getDeltaColor/getDeltaColor.es6.js';
 
 function beautifyNumber(num, decimal = 4) {
     return parseFloat(num.toFixed(decimal));
@@ -26,12 +27,15 @@ function test(test, callback, timeout = scope) {
             return;
         }
     }
-    function log(result, average) {
-        console.log(`${deepPrefix} ${chalk.yellow(test)}${average ? ` [${chalk.yellow(beautifyNumber(average))}]` : ''}: ${result}`);
+    function log(result, average, delta) {
+        console.log(`${deepPrefix} ${chalk.yellow(test)}${average ? ` [${chalk.yellow(beautifyNumber(average))}]` : ''}: ${result}${delta ? getDeltaColor(delta, ` (Δ ${beautifyNumber(delta, 2)}%)`) : ''}`);
     }
     if (test in object) {
         const { min, max } = object[test];
         const averageValue = object[test].value = (object[test].value + value) / 2;
+        const currentMin = Math.min(min, value);
+        const currentMax = Math.max(min, value);
+        const delta = (currentMax - currentMin) / currentMax * 100;
         if (value < min) {
             const level = ((min - value) * 10 / min) | 0;
             let arrow = '<';
@@ -39,10 +43,10 @@ function test(test, callback, timeout = scope) {
                 arrow += '<';
             }
             if (min === max) {
-                log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)}`)}`, averageValue);
+                log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)}`)}`, averageValue, delta);
             }
             else {
-                log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)} < ${beautifyNumber(max)}`)}`, averageValue);
+                log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)} < ${beautifyNumber(max)}`)}`, averageValue, delta);
             }
             object[test].min = value;
         }
@@ -54,17 +58,17 @@ function test(test, callback, timeout = scope) {
                 arrow += '<';
             }
             if (min === max) {
-                log(`${chalk.gray(beautifyNumber(min))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue);
+                log(`${chalk.gray(beautifyNumber(min))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue, delta);
             }
             else {
-                log(`${chalk.gray(beautifyNumber(min) + ' < ' + beautifyNumber(max))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue);
+                log(`${chalk.gray(beautifyNumber(min) + ' < ' + beautifyNumber(max))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue, delta);
             }
         }
         else if (min === max) {
             log(beautifyNumber(value));
         }
         else {
-            log(`${chalk.gray(beautifyNumber(min) + ' <')} ${beautifyNumber(value)} ${chalk.gray('< ' + beautifyNumber(max))}`, averageValue);
+            log(`${chalk.gray(beautifyNumber(min) + ' <')} ${beautifyNumber(value)} ${chalk.gray('< ' + beautifyNumber(max))}`, averageValue, delta);
         }
     }
     else {

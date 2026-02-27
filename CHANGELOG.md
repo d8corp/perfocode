@@ -1,8 +1,14 @@
 # Changelog
 
+## v1.4
+
+### v1.4.0 [![27.02.2026](https://img.shields.io/date/1772151364)](https://github.com/d8corp/perfocode/tree/v1.4.0)
+
+- Add delta
+
 ## v1.3
 
-### v1.3.0 [![25.02.2026](https://img.shields.io/date/1772134861)](https://github.com/d8corp/perfocode/tree/v1.3.0)
+### v1.3.0 [![26.02.2026](https://img.shields.io/date/1772134861)](https://github.com/d8corp/perfocode/tree/v1.3.0)
 
 - Change structure
 - Add `PERFOCODE_TIMEOUT`, `PERFOCODE_THROW_ERROR`, `PERFOCODE_NO_ASK`
