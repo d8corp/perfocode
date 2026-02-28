@@ -4,9 +4,14 @@ import { createInterface } from 'readline'
 
 import { scope } from './scope'
 import type { Callback, TimeoutOption } from './type'
+import { assignScope } from './utils'
 
 export function perfocode (output: string, callback: Callback, timeout: TimeoutOption = scope) {
-  const options = { ...Object.assign(scope, typeof timeout === 'number' ? { timeout } : timeout) }
+  const options = assignScope(timeout)
+
+  if (!global.gc || options.preventGC) {
+    console.warn(chalk.yellow('⚠ Use --expose-gc flag for accurate results!'))
+  }
 
   const readline1 = createInterface({
     input: process.stdin,
@@ -24,7 +29,15 @@ export function perfocode (output: string, callback: Callback, timeout: TimeoutO
       scope.result = JSON.parse(fs.readFileSync(output + '.json') as unknown as string)
     } catch {}
 
-    callback()
+    if (options.throwError) {
+      callback()
+    } else {
+      try {
+        callback()
+      } catch (e) {
+        console.log(chalk.red(`⚠ Error: ${e.message ?? e}`))
+      }
+    }
 
     const readline2 = createInterface({
       input: process.stdin,

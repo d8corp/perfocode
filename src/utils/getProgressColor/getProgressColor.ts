@@ -1,15 +1,17 @@
 import chalk from 'chalk'
 
-export function getProgressColor (progress: number, str: string) {
-  if (progress > 15) {
+import type { ProgressLimits } from '../../type'
+
+export function getProgressColor (progress: number, str: string, limits: ProgressLimits) {
+  if (progress > limits.good) {
     return chalk.green(str)
   }
 
-  if (progress > 10) {
+  if (progress > limits.warning) {
     return chalk.cyan(str)
   }
 
-  if (progress > 5) {
+  if (progress > limits.error) {
     return chalk.yellow(str)
   }
 

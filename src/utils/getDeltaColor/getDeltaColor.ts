@@ -1,15 +1,13 @@
 import chalk from 'chalk'
 
-export function getDeltaColor (delta: number, str: string) {
-  if (delta < 5) {
-    return chalk.green(str)
+import type { MinMaxDeltaLimits } from '../../type'
+
+export function getDeltaColor (delta: number, str: string, limits: MinMaxDeltaLimits) {
+  if (delta < limits.warning) {
+    return chalk.gray(str)
   }
 
-  if (delta < 10) {
-    return chalk.cyan(str)
-  }
-
-  if (delta < 20) {
+  if (delta < limits.error) {
     return chalk.yellow(str)
   }
 
