@@ -1,4 +1,4 @@
-<h1 align="center">perfocode</h1>
+<h1 align="center">Perfocode</h1>
 
 <p align="center">Performance Testing Engine</p>
 
