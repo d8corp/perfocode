@@ -11,9 +11,10 @@ export function assignScope (options: TimeoutOption = scope) {
     currentDelta = scope.limits.currentDelta,
     minDelta = scope.limits.minDelta,
     maxDelta = scope.limits.maxDelta,
+    deltaDelta = scope.limits.deltaDelta,
   } = limits
 
-  const normalizedLimits: Limits = { valueDelta, delta, progress, currentDelta, minDelta, maxDelta }
+  const normalizedLimits: Limits = { valueDelta, delta, progress, currentDelta, minDelta, maxDelta, deltaDelta }
 
   Object.assign(scope, normalizeOptions, { limits: normalizedLimits })
 

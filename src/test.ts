@@ -2,7 +2,14 @@ import chalk from 'chalk'
 
 import { scope } from './scope'
 import type { Callback, Options } from './type'
-import { assignScope, beautifyNumber, getCurrentResult, getDeltaColor, getPrefix, performance } from './utils'
+import {
+  assignScope,
+  beautifyNumber,
+  getCurrentResult,
+  getLimitColor,
+  getPrefix,
+  performance,
+} from './utils'
 
 export interface TestOptions extends Options {
   highlight?: boolean
@@ -41,7 +48,7 @@ export function test (test: string, callback: Callback, timeout: TestOptions | n
   }
 
   function log (result: string | number, average?: number, delta?: number) {
-    const deltaText = delta ? getDeltaColor(delta, ` (Δ ${beautifyNumber(delta, 2)}%)`, options.limits.delta) : ''
+    const deltaText = delta ? getLimitColor(delta, ` (Δ ${beautifyNumber(delta, 2)}%)`, options.limits.delta) : ''
 
     console.log(`${deepPrefix} ${chalk.yellow(test)}${average ? ` [${chalk.yellow(beautifyNumber(average))}]` : ''}: ${result}${deltaText}`)
   }

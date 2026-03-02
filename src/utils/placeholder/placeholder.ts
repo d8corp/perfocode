@@ -4,9 +4,9 @@ export type PlaceholderValueOverride<T extends Record<string, any>> = <K extends
   value: V,
   id: K,
   offset: number,
+  match: string,
   data: T,
   text: string,
-  match: string,
 ) => string
 
 export type PlaceholderResultOverride<T extends Record<string, any>, E extends keyof T = never> = <K extends keyof T, V extends T[K]>(
@@ -28,7 +28,7 @@ export function placeholder<T extends Record<string, any>> (
   return text.replace(
     PLACEHOLDER_REG,
     (match, id, offset, text) => {
-      return resultOverride(valueOverride(data[id], id, offset, data, text, match), id, data[id], data, offset, match, text)
+      return resultOverride(valueOverride(data[id], id, offset, match, data, text), id, data[id], data, offset, match, text)
     },
   )
 }

@@ -1,33 +1,19 @@
 export type Callback = () => void
 
-export interface MinMaxDeltaLimits {
-  warning: number
-  error: number
-}
-
-export interface ProgressLimits {
-  warning: number
-  error: number
+export interface Limit {
+  invert?: boolean
+  awesome: number
+  great: number
   good: number
-}
-
-export interface DeltaLimits {
+  normal: number
   poor: number
   bad: number
   critical: number
-  good: number
-  great: number
-  awesome: number
 }
 
-export interface Limits {
-  delta: MinMaxDeltaLimits
-  progress: ProgressLimits
-  valueDelta: DeltaLimits
-  currentDelta: DeltaLimits
-  minDelta: DeltaLimits
-  maxDelta: DeltaLimits
-}
+export type LimitId = 'delta' | 'progress' | 'valueDelta' | 'currentDelta' | 'minDelta' | 'maxDelta' | 'deltaDelta'
+
+export type Limits = Record<LimitId, Limit>
 
 export interface Result {
   value?: number
@@ -62,6 +48,12 @@ export interface Scope {
   preventGC: boolean
   limits: Partial<Limits>
   columns: string[]
+  progressIcon: string
+  progressEndIcon: string
+  successStatusIcon: string
+  errorStatusIcon: string
+  warningStatusIcon: string
+  deltaIcon: string
 }
 
 export type Options = Partial<Scope>
