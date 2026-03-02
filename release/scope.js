@@ -2,13 +2,103 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+const defaultLimits = {
+    delta: {
+        awesome: 0,
+        great: 0,
+        good: 0,
+        normal: 0,
+        poor: -10,
+        bad: -20,
+        critical: -30,
+    },
+    deltaDelta: {
+        invert: true,
+        awesome: 0,
+        great: 0,
+        good: 0,
+        normal: 0,
+        poor: 5,
+        bad: 50,
+        critical: 75,
+    },
+    progress: {
+        awesome: 90,
+        great: 75,
+        good: 50,
+        normal: 50,
+        poor: 50,
+        bad: 25,
+        critical: 10,
+    },
+    valueDelta: {
+        awesome: 15,
+        great: 10,
+        good: 5,
+        normal: 5,
+        poor: -5,
+        bad: -10,
+        critical: -15,
+    },
+    currentDelta: {
+        awesome: 15,
+        great: 10,
+        good: 5,
+        normal: 5,
+        poor: -5,
+        bad: -10,
+        critical: -15,
+    },
+    minDelta: {
+        awesome: 15,
+        great: 10,
+        good: 5,
+        normal: 5,
+        poor: -5,
+        bad: -10,
+        critical: -15,
+    },
+    maxDelta: {
+        awesome: 15,
+        great: 10,
+        good: 5,
+        normal: 5,
+        poor: -5,
+        bad: -10,
+        critical: -15,
+    },
+};
 const scope = {
     deep: [],
     result: {},
     errors: 0,
+    progressIcon: process.env.PERFOCODE_PROGRESS_ICON ?? '▰',
+    progressEndIcon: process.env.PERFOCODE_PROGRESS_END_ICON ?? '▱',
+    successStatusIcon: process.env.PERFOCODE_SUCCESS_STATUS_ICON ?? '✔',
+    errorStatusIcon: process.env.PERFOCODE_ERROR_STATUS_ICON ?? '✘',
+    warningStatusIcon: process.env.PERFOCODE_WARNING_STATUS_ICON ?? '⚠',
+    deltaIcon: process.env.PERFOCODE_DELTA_ICON ?? 'Δ',
     timeout: process.env.PERFOCODE_TIMEOUT ? Number(process.env.PERFOCODE_TIMEOUT) : 300,
     throwError: process.env.PERFOCODE_THROW_ERROR ? process.env.PERFOCODE_THROW_ERROR === 'true' : false,
+    preventGC: process.env.PERFOCODE_PREVENT_GC ? process.env.PERFOCODE_PREVENT_GC === 'true' : false,
     noAsk: process.env.PERFOCODE_NO_ASK ? process.env.PERFOCODE_NO_ASK === 'true' : false,
+    logging: process.env.PERFOCODE_LOGGING ? process.env.PERFOCODE_LOGGING === 'true' : false,
+    limits: process.env.PERFOCODE_LIMITS ? JSON.parse(process.env.PERFOCODE_LIMITS) : defaultLimits,
+    columns: process.env.PERFOCODE_COLUMNS
+        ? process.env.PERFOCODE_COLUMNS.split('|').map(type => type.trim())
+        : [
+            '{statusIcon} {name}',
+            '{current}{currentDelta}',
+            'Σ {value}{valueDelta}',
+            '{progressStart}{progressEnd}',
+            '{progressDelta}',
+            '{min} → {average} ← {max}{minDelta}{maxDelta}',
+            '{deltaIcon} {delta}{deltaDelta}',
+            // '↺ {prevDeltaIcon} {prevDelta}',
+            // '↺ {prev}',
+            // '↺ {prevMin} → {prevAverage} ← {prevMax}',
+        ],
 };
 
+exports.defaultLimits = defaultLimits;
 exports.scope = scope;

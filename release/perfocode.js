@@ -6,6 +6,8 @@ var chalk = require('chalk');
 var fs = require('node:fs');
 var node_readline = require('node:readline');
 var scope = require('./scope.js');
+require('./utils/index.js');
+var assignScope = require('./utils/assignScope/assignScope.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -13,7 +15,10 @@ var chalk__default = /*#__PURE__*/_interopDefaultLegacy(chalk);
 var fs__default = /*#__PURE__*/_interopDefaultLegacy(fs);
 
 function perfocode(output, callback, timeout = scope.scope) {
-    const options = { ...Object.assign(scope.scope, typeof timeout === 'number' ? { timeout } : timeout) };
+    const options = assignScope.assignScope(timeout);
+    if (!global.gc || options.preventGC) {
+        console.warn(chalk__default["default"].yellow('⚠ Use --expose-gc flag for accurate results!'));
+    }
     const readline1 = node_readline.createInterface({
         input: process.stdin,
         output: process.stdout,
@@ -27,7 +32,17 @@ function perfocode(output, callback, timeout = scope.scope) {
             scope.scope.result = JSON.parse(fs__default["default"].readFileSync(output + '.json'));
         }
         catch { }
-        callback();
+        if (options.throwError) {
+            callback();
+        }
+        else {
+            try {
+                callback();
+            }
+            catch (e) {
+                console.log(chalk__default["default"].red(`⚠ Error: ${e.message ?? e}`));
+            }
+        }
         const readline2 = node_readline.createInterface({
             input: process.stdin,
             output: process.stdout,

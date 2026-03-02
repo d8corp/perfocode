@@ -8,21 +8,27 @@ var scope = require('./scope.js');
 var test = require('./test.js');
 require('./type.js');
 require('./utils/index.js');
+var assignScope = require('./utils/assignScope/assignScope.js');
+var beautifyNumber = require('./utils/beautifyNumber/beautifyNumber.js');
+var deltaLimitPlaceholder = require('./utils/deltaLimitPlaceholder/deltaLimitPlaceholder.js');
 var getCurrentResult = require('./utils/getCurrentResult/getCurrentResult.js');
-var getDeltaColor = require('./utils/getDeltaColor/getDeltaColor.js');
+var getLimitColor = require('./utils/getLimitColor/getLimitColor.js');
 var getPrefix = require('./utils/getPrefix/getPrefix.js');
-var getProgressColor = require('./utils/getProgressColor/getProgressColor.js');
 var performance = require('./utils/performance/performance.js');
+var placeholder = require('./utils/placeholder/placeholder.js');
 
 
 
 exports.describe = describe.describe;
 exports.perfocode = perfocode.perfocode;
+exports.defaultLimits = scope.defaultLimits;
 exports.scope = scope.scope;
-exports.beautifyNumber = test.beautifyNumber;
 exports.test = test.test;
+exports.assignScope = assignScope.assignScope;
+exports.beautifyNumber = beautifyNumber.beautifyNumber;
+exports.deltaLimitPlaceholder = deltaLimitPlaceholder.deltaLimitPlaceholder;
 exports.getCurrentResult = getCurrentResult.getCurrentResult;
-exports.getDeltaColor = getDeltaColor.getDeltaColor;
+exports.getLimitColor = getLimitColor.getLimitColor;
 exports.getPrefix = getPrefix.getPrefix;
-exports.getProgressColor = getProgressColor.getProgressColor;
 exports.performance = performance.performance;
+exports.placeholder = placeholder.placeholder;

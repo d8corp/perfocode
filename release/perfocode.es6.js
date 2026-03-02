@@ -2,9 +2,14 @@ import chalk from 'chalk';
 import fs from 'node:fs';
 import { createInterface } from 'node:readline';
 import { scope } from './scope.es6.js';
+import './utils/index.es6.js';
+import { assignScope } from './utils/assignScope/assignScope.es6.js';
 
 function perfocode(output, callback, timeout = scope) {
-    const options = { ...Object.assign(scope, typeof timeout === 'number' ? { timeout } : timeout) };
+    const options = assignScope(timeout);
+    if (!global.gc || options.preventGC) {
+        console.warn(chalk.yellow('⚠ Use --expose-gc flag for accurate results!'));
+    }
     const readline1 = createInterface({
         input: process.stdin,
         output: process.stdout,
@@ -18,7 +23,17 @@ function perfocode(output, callback, timeout = scope) {
             scope.result = JSON.parse(fs.readFileSync(output + '.json'));
         }
         catch { }
-        callback();
+        if (options.throwError) {
+            callback();
+        }
+        else {
+            try {
+                callback();
+            }
+            catch (e) {
+                console.log(chalk.red(`⚠ Error: ${e.message ?? e}`));
+            }
+        }
         const readline2 = createInterface({
             input: process.stdin,
             output: process.stdout,

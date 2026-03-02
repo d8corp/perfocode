@@ -1,11 +1,14 @@
 export { describe } from './describe.es6.js';
 export { perfocode } from './perfocode.es6.js';
-export { scope } from './scope.es6.js';
-export { beautifyNumber, test } from './test.es6.js';
+export { defaultLimits, scope } from './scope.es6.js';
+export { test } from './test.es6.js';
 import './type.es6.js';
 import './utils/index.es6.js';
+export { assignScope } from './utils/assignScope/assignScope.es6.js';
+export { beautifyNumber } from './utils/beautifyNumber/beautifyNumber.es6.js';
+export { deltaLimitPlaceholder } from './utils/deltaLimitPlaceholder/deltaLimitPlaceholder.es6.js';
 export { getCurrentResult } from './utils/getCurrentResult/getCurrentResult.es6.js';
-export { getDeltaColor } from './utils/getDeltaColor/getDeltaColor.es6.js';
+export { getLimitColor } from './utils/getLimitColor/getLimitColor.es6.js';
 export { getPrefix } from './utils/getPrefix/getPrefix.es6.js';
-export { getProgressColor } from './utils/getProgressColor/getProgressColor.es6.js';
 export { performance } from './utils/performance/performance.es6.js';
+export { placeholder } from './utils/placeholder/placeholder.es6.js';

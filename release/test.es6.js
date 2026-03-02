@@ -1,19 +1,23 @@
 import chalk from 'chalk';
 import { scope } from './scope.es6.js';
 import './utils/index.es6.js';
+import { assignScope } from './utils/assignScope/assignScope.es6.js';
 import { getCurrentResult } from './utils/getCurrentResult/getCurrentResult.es6.js';
 import { getPrefix } from './utils/getPrefix/getPrefix.es6.js';
 import { performance } from './utils/performance/performance.es6.js';
-import { getDeltaColor } from './utils/getDeltaColor/getDeltaColor.es6.js';
+import { getLimitColor } from './utils/getLimitColor/getLimitColor.es6.js';
+import { beautifyNumber } from './utils/beautifyNumber/beautifyNumber.es6.js';
 
-function beautifyNumber(num, decimal = 4) {
-    return parseFloat(num.toFixed(decimal));
-}
 function test(test, callback, timeout = scope) {
-    const options = Object.assign({}, scope, typeof timeout === 'number' ? { timeout } : timeout);
+    const { highlight, ...rest } = typeof timeout === 'number' ? { timeout } : timeout;
+    const options = assignScope(rest);
+    if (!options.preventGC) {
+        global.gc?.();
+    }
     let value = 0;
     const object = getCurrentResult(scope);
     const deepPrefix = getPrefix().slice(0, -1) + '╞';
+    const logging = options.logging || !scope.deep.length;
     if (options.throwError) {
         value = performance(callback, options.timeout);
     }
@@ -22,64 +26,91 @@ function test(test, callback, timeout = scope) {
             value = performance(callback, options.timeout);
         }
         catch (e) {
-            console.log(`${deepPrefix} ${chalk.red(`${test}: Error (${e.message ?? e})`)}`);
+            console.log(`${deepPrefix} ${chalk.red(`${test}: ⚠ ${e.message ?? e}`)}`);
             scope.errors++;
+            object[test] = {
+                ...object[test],
+                error: e,
+            };
             return;
         }
     }
     function log(result, average, delta) {
-        console.log(`${deepPrefix} ${chalk.yellow(test)}${average ? ` [${chalk.yellow(beautifyNumber(average))}]` : ''}: ${result}${delta ? getDeltaColor(delta, ` (Δ ${beautifyNumber(delta, 2)}%)`) : ''}`);
+        const deltaText = delta ? getLimitColor(delta, ` (Δ ${beautifyNumber(delta, 2)}%)`, options.limits.delta) : '';
+        console.log(`${deepPrefix} ${chalk.yellow(test)}${average ? ` [${chalk.yellow(beautifyNumber(average))}]` : ''}: ${result}${deltaText}`);
     }
     if (test in object) {
+        object[test].success = Symbol('Success');
+        object[test].prev = object[test].value;
+        object[test].current = value;
+        object[test].prevMin = object[test].min;
+        object[test].prevMax = object[test].max;
+        object[test].highlight = highlight;
         const { min, max } = object[test];
         const averageValue = object[test].value = (object[test].value + value) / 2;
         const currentMin = Math.min(min, value);
         const currentMax = Math.max(min, value);
         const delta = (currentMax - currentMin) / currentMax * 100;
         if (value < min) {
-            const level = ((min - value) * 10 / min) | 0;
-            let arrow = '<';
-            for (let i = 0; i < level; i++) {
-                arrow += '<';
-            }
-            if (min === max) {
-                log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)}`)}`, averageValue, delta);
-            }
-            else {
-                log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)} < ${beautifyNumber(max)}`)}`, averageValue, delta);
-            }
             object[test].min = value;
+            if (logging) {
+                const level = ((min - value) * 10 / min) | 0;
+                let arrow = '<';
+                for (let i = 0; i < level; i++) {
+                    arrow += '<';
+                }
+                if (min === max) {
+                    log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)}`)}`, averageValue, delta);
+                }
+                else {
+                    log(`${chalk.red(`${beautifyNumber(value)} ${arrow}`)} ${chalk.gray(`${beautifyNumber(min)} < ${beautifyNumber(max)}`)}`, averageValue, delta);
+                }
+            }
         }
         else if (value > max) {
             object[test].max = value;
-            const level = ((value - max) * 10 / value) | 0;
-            let arrow = '<';
-            for (let i = 0; i < level; i++) {
-                arrow += '<';
+            if (logging) {
+                const level = ((value - max) * 10 / value) | 0;
+                let arrow = '<';
+                for (let i = 0; i < level; i++) {
+                    arrow += '<';
+                }
+                if (min === max) {
+                    log(`${chalk.gray(beautifyNumber(min))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue, delta);
+                }
+                else {
+                    log(`${chalk.gray(beautifyNumber(min) + ' < ' + beautifyNumber(max))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue, delta);
+                }
             }
+        }
+        else if (logging) {
             if (min === max) {
-                log(`${chalk.gray(beautifyNumber(min))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue, delta);
+                log(beautifyNumber(value));
             }
             else {
-                log(`${chalk.gray(beautifyNumber(min) + ' < ' + beautifyNumber(max))} ${chalk.green(arrow + ` ${beautifyNumber(value)}`)}`, averageValue, delta);
+                log(`${chalk.gray(beautifyNumber(min) + ' <')} ${beautifyNumber(value)} ${chalk.gray('< ' + beautifyNumber(max))}`, averageValue, delta);
             }
-        }
-        else if (min === max) {
-            log(beautifyNumber(value));
-        }
-        else {
-            log(`${chalk.gray(beautifyNumber(min) + ' <')} ${beautifyNumber(value)} ${chalk.gray('< ' + beautifyNumber(max))}`, averageValue, delta);
         }
     }
     else {
         object[test] = {
             min: value,
             max: value,
+            prevMin: value,
+            prevMax: value,
             value,
+            prev: value,
+            current: value,
+            success: Symbol('Success'),
+            highlight,
         };
-        log(beautifyNumber(value));
+        if (logging) {
+            log(beautifyNumber(value));
+        }
     }
-    global.gc?.();
+    if (!options.preventGC) {
+        global.gc?.();
+    }
 }
 
-export { beautifyNumber, test };
+export { test };

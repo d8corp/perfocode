@@ -1,5 +1,22 @@
 # Changelog
 
+## v1.5
+
+### v1.5.0 [![02.03.2026](https://img.shields.io/date/1772479280)](https://github.com/d8corp/perfocode/tree/v1.5.0)
+
+- Add customizable columns system
+- Add `deltaDelta`, `currentDelta`, `minDelta`, `maxDelta` limits
+- Add `PERFOCODE_PROGRESS_ICON`, `PERFOCODE_PROGRESS_END_ICON`
+- Add `PERFOCODE_SUCCESS_STATUS_ICON`, `PERFOCODE_ERROR_STATUS_ICON`, `PERFOCODE_WARNING_STATUS_ICON`, `PERFOCODE_DELTA_ICON`
+- Add `PERFOCODE_PREVENT_GC` for GC control
+- Add `PERFOCODE_LOGGING` for detailed output
+- Add `PERFOCODE_LIMITS` for custom thresholds
+- Add `PERFOCODE_COLUMNS` for custom layout
+- Add `highlight` option for `test`
+- Add `logging` option
+- Add `preventGC` option
+- Improve error handling with `throwError`
+
 ## v1.4
 
 ### v1.4.0 [![27.02.2026](https://img.shields.io/date/1772151364)](https://github.com/d8corp/perfocode/tree/v1.4.0)
