@@ -6,7 +6,7 @@ perfocode('output-file', () => {
       constructor (private _value = 0) {}
 
       get value () {
-        for (let i = 0; i < 1000; i++) { /* empty */ }
+        // for (let i = 0; i < 1000; i++) { /* empty */ }
 
         return this._value
       }

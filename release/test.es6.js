@@ -11,8 +11,8 @@ import { beautifyNumber } from './utils/beautifyNumber/beautifyNumber.es6.js';
 function test(test, callback, timeout = scope) {
     const { highlight, ...rest } = typeof timeout === 'number' ? { timeout } : timeout;
     const options = assignScope(rest);
-    if (!options.preventGC) {
-        global.gc?.();
+    if (!options.preventGC && typeof gc !== 'undefined') {
+        gc();
     }
     let value = 0;
     const object = getCurrentResult(scope);
@@ -108,8 +108,8 @@ function test(test, callback, timeout = scope) {
             log(beautifyNumber(value));
         }
     }
-    if (!options.preventGC) {
-        global.gc?.();
+    if (!options.preventGC && typeof gc !== 'undefined') {
+        gc();
     }
 }
 

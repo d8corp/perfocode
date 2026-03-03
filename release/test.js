@@ -19,8 +19,8 @@ var chalk__default = /*#__PURE__*/_interopDefaultLegacy(chalk);
 function test(test, callback, timeout = scope.scope) {
     const { highlight, ...rest } = typeof timeout === 'number' ? { timeout } : timeout;
     const options = assignScope.assignScope(rest);
-    if (!options.preventGC) {
-        global.gc?.();
+    if (!options.preventGC && typeof gc !== 'undefined') {
+        gc();
     }
     let value = 0;
     const object = getCurrentResult.getCurrentResult(scope.scope);
@@ -116,8 +116,8 @@ function test(test, callback, timeout = scope.scope) {
             log(beautifyNumber.beautifyNumber(value));
         }
     }
-    if (!options.preventGC) {
-        global.gc?.();
+    if (!options.preventGC && typeof gc !== 'undefined') {
+        gc();
     }
 }
 

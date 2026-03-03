@@ -19,8 +19,8 @@ export function test (test: string, callback: Callback, timeout: TestOptions | n
   const { highlight, ...rest } = typeof timeout === 'number' ? { timeout } : timeout
   const options = assignScope(rest)
 
-  if (!options.preventGC) {
-    global.gc?.()
+  if (!options.preventGC && typeof gc !== 'undefined') {
+    gc()
   }
 
   let value = 0
@@ -126,7 +126,7 @@ export function test (test: string, callback: Callback, timeout: TestOptions | n
     }
   }
 
-  if (!options.preventGC) {
-    global.gc?.()
+  if (!options.preventGC && typeof gc !== 'undefined') {
+    gc()
   }
 }

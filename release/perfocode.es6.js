@@ -7,7 +7,12 @@ import { assignScope } from './utils/assignScope/assignScope.es6.js';
 
 function perfocode(output, callback, timeout = scope) {
     const options = assignScope(timeout);
-    if (!global.gc || options.preventGC) {
+    // @ts-expect-error Bun
+    if (typeof Bun !== 'undefined') {
+        // @ts-expect-error Bun
+        global.gc ??= Bun.gc;
+    }
+    if (typeof gc === 'undefined' || options.preventGC) {
         console.warn(chalk.yellow('⚠ Use --expose-gc flag for accurate results!'));
     }
     const readline1 = createInterface({

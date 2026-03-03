@@ -9,7 +9,13 @@ import { assignScope } from './utils'
 export function perfocode (output: string, callback: Callback, timeout: TimeoutOption = scope) {
   const options = assignScope(timeout)
 
-  if (!global.gc || options.preventGC) {
+  // @ts-expect-error Bun
+  if (typeof Bun !== 'undefined') {
+    // @ts-expect-error Bun
+    global.gc ??= Bun.gc
+  }
+
+  if (typeof gc === 'undefined' || options.preventGC) {
     console.warn(chalk.yellow('⚠ Use --expose-gc flag for accurate results!'))
   }
 

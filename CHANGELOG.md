@@ -2,6 +2,10 @@
 
 ## v1.5
 
+### v1.5.1 [![03.03.2026](https://img.shields.io/date/1772537972)](https://github.com/d8corp/perfocode/tree/v1.5.1)
+
+- Add `Bun` support
+
 ### v1.5.0 [![02.03.2026](https://img.shields.io/date/1772479280)](https://github.com/d8corp/perfocode/tree/v1.5.0)
 
 - Add customizable columns system
