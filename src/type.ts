@@ -1,4 +1,15 @@
 export type Callback = () => void
+export type AfterCall = () => Callback | void
+export type BeforeCall = () => Callback
+export type BeforeAfterCall = () => AfterCall
+
+export type Call<A extends boolean = false, B extends boolean = false> = B extends true
+  ? A extends true
+    ? BeforeAfterCall
+    : BeforeCall
+  : A extends true
+    ? AfterCall
+    : Callback
 
 export interface Limit {
   invert?: boolean

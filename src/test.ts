@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 
 import { scope } from './scope'
-import type { Callback, Options } from './type'
+import type { Call, Options } from './type'
 import {
   assignScope,
   beautifyNumber,
@@ -11,12 +11,31 @@ import {
   performance,
 } from './utils'
 
-export interface TestOptions extends Options {
+export interface TestOptions<A extends boolean = false, B extends boolean = false> extends Options {
   highlight?: boolean
+  useBefore?: B
+  useAfter?: A
 }
 
-export function test (test: string, callback: Callback, timeout: TestOptions | number = scope) {
-  const { highlight, ...rest } = typeof timeout === 'number' ? { timeout } : timeout
+export interface TestParams<A extends boolean = false, B extends boolean = false> extends TestOptions<A, B> {
+  name: string
+  call: Call<A, B>
+}
+
+export function test<A extends boolean = false, B extends boolean = false> (name: string, call: Call<A, B>, timeout?: TestOptions | number): void
+export function test<A extends boolean = false, B extends boolean = false> (params: TestParams<A, B>): void
+
+export function test<A extends boolean = false, B extends boolean = false> (
+  testName: string | TestParams<A, B>,
+  callback?: Call<A, B>,
+  timeout: TestOptions<A, B> | number = scope.timeout,
+) {
+  const { name = testName as string, call = callback, highlight, useAfter, useBefore, ...rest } = typeof timeout === 'number'
+    ? { timeout }
+    : callback
+      ? timeout as TestParams<A, B>
+      : testName as TestParams<A, B>
+
   const options = assignScope(rest)
 
   if (!options.preventGC && typeof gc !== 'undefined') {
@@ -30,16 +49,16 @@ export function test (test: string, callback: Callback, timeout: TestOptions | n
   const logging = options.logging || !scope.deep.length
 
   if (options.throwError) {
-    value = performance(callback, options.timeout)
+    value = performance(call, options.timeout, useBefore, useAfter)
   } else {
     try {
-      value = performance(callback, options.timeout)
+      value = performance(call, options.timeout, useBefore, useAfter)
     } catch (e) {
-      console.log(`${deepPrefix} ${chalk.red(`${test}: ⚠ ${e.message ?? e}`)}`)
+      console.log(`${deepPrefix} ${chalk.red(`${name}: ⚠ ${e.message ?? e}`)}`)
       scope.errors++
 
-      object[test] = {
-        ...object[test],
+      object[name] = {
+        ...object[name],
         error: e,
       }
 
@@ -50,25 +69,25 @@ export function test (test: string, callback: Callback, timeout: TestOptions | n
   function log (result: string | number, average?: number, delta?: number) {
     const deltaText = delta ? getLimitColor(delta, ` (Δ ${beautifyNumber(delta, 2)}%)`, options.limits.delta) : ''
 
-    console.log(`${deepPrefix} ${chalk.yellow(test)}${average ? ` [${chalk.yellow(beautifyNumber(average))}]` : ''}: ${result}${deltaText}`)
+    console.log(`${deepPrefix} ${chalk.yellow(name)}${average ? ` [${chalk.yellow(beautifyNumber(average))}]` : ''}: ${result}${deltaText}`)
   }
 
-  if (test in object) {
-    object[test].success = Symbol('Success')
-    object[test].prev = object[test].value
-    object[test].current = value
-    object[test].prevMin = object[test].min
-    object[test].prevMax = object[test].max
-    object[test].highlight = highlight
+  if (name in object) {
+    object[name].success = Symbol('Success')
+    object[name].prev = object[name].value
+    object[name].current = value
+    object[name].prevMin = object[name].min
+    object[name].prevMax = object[name].max
+    object[name].highlight = highlight
 
-    const { min, max } = object[test]
-    const averageValue = object[test].value = (object[test].value + value) / 2
+    const { min, max } = object[name]
+    const averageValue = object[name].value = (object[name].value + value) / 2
     const currentMin = Math.min(min, value)
     const currentMax = Math.max(min, value)
     const delta = (currentMax - currentMin) / currentMax * 100
 
     if (value < min) {
-      object[test].min = value
+      object[name].min = value
 
       if (logging) {
         const level = ((min - value) * 10 / min) | 0
@@ -85,7 +104,7 @@ export function test (test: string, callback: Callback, timeout: TestOptions | n
         }
       }
     } else if (value > max) {
-      object[test].max = value
+      object[name].max = value
 
       if (logging) {
         const level = ((value - max) * 10 / value) | 0
@@ -109,7 +128,7 @@ export function test (test: string, callback: Callback, timeout: TestOptions | n
       }
     }
   } else {
-    object[test] = {
+    object[name] = {
       min: value,
       max: value,
       prevMin: value,

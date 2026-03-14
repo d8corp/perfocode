@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 
 import { scope } from './scope'
-import type { Callback, Result, TimeoutOption, Winner } from './type'
+import type { Callback, Options, Result, TimeoutOption, Winner } from './type'
 import {
   assignScope,
   beautifyNumber,
@@ -11,9 +11,28 @@ import {
   getPrefix,
 } from './utils'
 
-export function describe (name: string, callback: Callback, timeout: TimeoutOption = scope) {
+export interface DescribeParams extends Options {
+  name: string
+  call: Callback
+}
+
+export function describe (output: string, callback: Callback, timeout?: TimeoutOption): void
+export function describe (params: DescribeParams): void
+
+export function describe (params: string | DescribeParams, callback?: Callback, timeout: TimeoutOption = scope.timeout) {
   const prevScope = Object.assign({}, scope)
-  const options = assignScope(timeout)
+
+  const {
+    name = params as string,
+    call = callback,
+    ...rest
+  } = typeof timeout === 'number'
+    ? { timeout }
+    : callback
+      ? timeout as DescribeParams
+      : params as DescribeParams
+
+  const options = assignScope(rest)
 
   console.log(getPrefix() + '╒ ' + name)
   scope.deep.push(name)
@@ -21,10 +40,10 @@ export function describe (name: string, callback: Callback, timeout: TimeoutOpti
   let failed = false
 
   if (options.throwError) {
-    callback()
+    call()
   } else {
     try {
-      callback()
+      call()
     } catch (e) {
       console.log(`${getPrefix()} ${chalk.red(`⚠ ${e.message ?? e}`)}`)
       scope.errors++

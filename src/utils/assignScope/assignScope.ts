@@ -1,8 +1,8 @@
 import { scope } from '../../scope'
-import type { Limits, TimeoutOption } from '../../type'
+import type { Limits, Options } from '../../type'
 
-export function assignScope (options: TimeoutOption = scope) {
-  const { limits = scope.limits, ...normalizeOptions } = typeof options === 'number' ? { timeout: options } : options
+export function assignScope (options: Options) {
+  const { limits = scope.limits, ...normalizeOptions } = options
 
   const {
     valueDelta = scope.limits.valueDelta,

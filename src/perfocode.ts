@@ -3,11 +3,29 @@ import fs from 'fs'
 import { createInterface } from 'readline'
 
 import { scope } from './scope'
-import type { Callback, TimeoutOption } from './type'
+import type { Callback, Options, TimeoutOption } from './type'
 import { assignScope } from './utils'
 
-export function perfocode (output: string, callback: Callback, timeout: TimeoutOption = scope) {
-  const options = assignScope(timeout)
+export interface PerfocodeParams extends Options {
+  output: string
+  call: Callback
+}
+
+export function perfocode (output: string, callback: Callback, timeout?: TimeoutOption): void
+export function perfocode (params: PerfocodeParams): void
+
+export function perfocode (params: string | PerfocodeParams, callback?: Callback, timeout: TimeoutOption = scope.timeout) {
+  let {
+    output = params as string,
+    call = callback,
+    ...rest
+  } = typeof timeout === 'number'
+    ? { timeout }
+    : callback
+      ? timeout as PerfocodeParams
+      : params as PerfocodeParams
+
+  const options = assignScope(rest)
 
   // @ts-expect-error Bun
   if (typeof Bun !== 'undefined') {
@@ -36,10 +54,10 @@ export function perfocode (output: string, callback: Callback, timeout: TimeoutO
     } catch {}
 
     if (options.throwError) {
-      callback()
+      call()
     } else {
       try {
-        callback()
+        call()
       } catch (e) {
         console.log(chalk.red(`⚠ Error: ${e.message ?? e}`))
       }
