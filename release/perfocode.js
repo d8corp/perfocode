@@ -14,8 +14,13 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 var chalk__default = /*#__PURE__*/_interopDefaultLegacy(chalk);
 var fs__default = /*#__PURE__*/_interopDefaultLegacy(fs);
 
-function perfocode(output, callback, timeout = scope.scope) {
-    const options = assignScope.assignScope(timeout);
+function perfocode(params, callback, timeout = scope.scope.timeout) {
+    let { output = params, call = callback, ...rest } = typeof timeout === 'number'
+        ? { timeout }
+        : callback
+            ? timeout
+            : params;
+    const options = assignScope.assignScope(rest);
     // @ts-expect-error Bun
     if (typeof Bun !== 'undefined') {
         // @ts-expect-error Bun
@@ -38,11 +43,11 @@ function perfocode(output, callback, timeout = scope.scope) {
         }
         catch { }
         if (options.throwError) {
-            callback();
+            call();
         }
         else {
             try {
-                callback();
+                call();
             }
             catch (e) {
                 console.log(chalk__default["default"].red(`⚠ Error: ${e.message ?? e}`));

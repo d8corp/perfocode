@@ -5,8 +5,13 @@ import { scope } from './scope.es6.js';
 import './utils/index.es6.js';
 import { assignScope } from './utils/assignScope/assignScope.es6.js';
 
-function perfocode(output, callback, timeout = scope) {
-    const options = assignScope(timeout);
+function perfocode(params, callback, timeout = scope.timeout) {
+    let { output = params, call = callback, ...rest } = typeof timeout === 'number'
+        ? { timeout }
+        : callback
+            ? timeout
+            : params;
+    const options = assignScope(rest);
     // @ts-expect-error Bun
     if (typeof Bun !== 'undefined') {
         // @ts-expect-error Bun
@@ -29,11 +34,11 @@ function perfocode(output, callback, timeout = scope) {
         }
         catch { }
         if (options.throwError) {
-            callback();
+            call();
         }
         else {
             try {
-                callback();
+                call();
             }
             catch (e) {
                 console.log(chalk.red(`⚠ Error: ${e.message ?? e}`));

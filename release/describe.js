@@ -16,18 +16,23 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var chalk__default = /*#__PURE__*/_interopDefaultLegacy(chalk);
 
-function describe(name, callback, timeout = scope.scope) {
+function describe(params, callback, timeout = scope.scope.timeout) {
     const prevScope = Object.assign({}, scope.scope);
-    const options = assignScope.assignScope(timeout);
+    const { name = params, call = callback, ...rest } = typeof timeout === 'number'
+        ? { timeout }
+        : callback
+            ? timeout
+            : params;
+    const options = assignScope.assignScope(rest);
     console.log(getPrefix.getPrefix() + '╒ ' + name);
     scope.scope.deep.push(name);
     let failed = false;
     if (options.throwError) {
-        callback();
+        call();
     }
     else {
         try {
-            callback();
+            call();
         }
         catch (e) {
             console.log(`${getPrefix.getPrefix()} ${chalk__default["default"].red(`⚠ ${e.message ?? e}`)}`);

@@ -1,5 +1,5 @@
-import type { Limits, TimeoutOption } from '../../type';
-export declare function assignScope(options?: TimeoutOption): {
+import type { Limits, Options } from '../../type';
+export declare function assignScope(options: Options): {
     deep: string[];
     result: import("../../type").ResultTree;
     errors: 0;

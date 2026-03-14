@@ -1,11 +1,19 @@
-function performance(callback, ms) {
+function performance(call, ms, useBefore, useAfter) {
     let count = 0;
+    let spendTime = 0n;
     const endTime = process.hrtime.bigint() + (BigInt(ms) * 1000000n);
     do {
-        callback();
+        const test = useBefore ? call() : call;
+        const beforeTime = process.hrtime.bigint();
+        const result = test();
+        spendTime += process.hrtime.bigint() - beforeTime;
         count++;
+        if (useAfter && typeof result === 'function') {
+            result();
+        }
     } while (process.hrtime.bigint() < endTime);
-    return count / ms;
+    const spendMs = Number(spendTime / 1000000n);
+    return spendMs ? count / spendMs : 0;
 }
 
 export { performance };

@@ -8,18 +8,23 @@ import { beautifyNumber } from './utils/beautifyNumber/beautifyNumber.es6.js';
 import { deltaLimitPlaceholder } from './utils/deltaLimitPlaceholder/deltaLimitPlaceholder.es6.js';
 import { getLimitColor } from './utils/getLimitColor/getLimitColor.es6.js';
 
-function describe(name, callback, timeout = scope) {
+function describe(params, callback, timeout = scope.timeout) {
     const prevScope = Object.assign({}, scope);
-    const options = assignScope(timeout);
+    const { name = params, call = callback, ...rest } = typeof timeout === 'number'
+        ? { timeout }
+        : callback
+            ? timeout
+            : params;
+    const options = assignScope(rest);
     console.log(getPrefix() + '╒ ' + name);
     scope.deep.push(name);
     let failed = false;
     if (options.throwError) {
-        callback();
+        call();
     }
     else {
         try {
-            callback();
+            call();
         }
         catch (e) {
             console.log(`${getPrefix()} ${chalk.red(`⚠ ${e.message ?? e}`)}`);

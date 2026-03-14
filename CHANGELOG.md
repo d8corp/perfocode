@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.6
+
+### v1.6.0 [![14.03.2026](https://img.shields.io/date/1773485538)](https://github.com/d8corp/perfocode/tree/v1.6.0)
+
+- Improved measurement quality: excluded the time spent incrementing the counter in the benchmark loop from the measured time.
+- Add `useBefore` and `useAfter` options for performance measurements. These allow pre- and post-execution hooks around the tested callback.
+- Add params object syntax for `perfocode`, `describe`, and `test`: all three functions now accept a single object as first argument (`PerfocodeParams`, `DescribeParams`, `TestParams`) instead of separate parameters.
+
 ## v1.5
 
 ### v1.5.1 [![03.03.2026](https://img.shields.io/date/1772537972)](https://github.com/d8corp/perfocode/tree/v1.5.1)

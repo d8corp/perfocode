@@ -16,8 +16,12 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var chalk__default = /*#__PURE__*/_interopDefaultLegacy(chalk);
 
-function test(test, callback, timeout = scope.scope) {
-    const { highlight, ...rest } = typeof timeout === 'number' ? { timeout } : timeout;
+function test(testName, callback, timeout = scope.scope.timeout) {
+    const { name = testName, call = callback, highlight, useAfter, useBefore, ...rest } = typeof timeout === 'number'
+        ? { timeout }
+        : callback
+            ? timeout
+            : testName;
     const options = assignScope.assignScope(rest);
     if (!options.preventGC && typeof gc !== 'undefined') {
         gc();
@@ -27,17 +31,17 @@ function test(test, callback, timeout = scope.scope) {
     const deepPrefix = getPrefix.getPrefix().slice(0, -1) + '╞';
     const logging = options.logging || !scope.scope.deep.length;
     if (options.throwError) {
-        value = performance.performance(callback, options.timeout);
+        value = performance.performance(call, options.timeout, useBefore, useAfter);
     }
     else {
         try {
-            value = performance.performance(callback, options.timeout);
+            value = performance.performance(call, options.timeout, useBefore, useAfter);
         }
         catch (e) {
-            console.log(`${deepPrefix} ${chalk__default["default"].red(`${test}: ⚠ ${e.message ?? e}`)}`);
+            console.log(`${deepPrefix} ${chalk__default["default"].red(`${name}: ⚠ ${e.message ?? e}`)}`);
             scope.scope.errors++;
-            object[test] = {
-                ...object[test],
+            object[name] = {
+                ...object[name],
                 error: e,
             };
             return;
@@ -45,22 +49,22 @@ function test(test, callback, timeout = scope.scope) {
     }
     function log(result, average, delta) {
         const deltaText = delta ? getLimitColor.getLimitColor(delta, ` (Δ ${beautifyNumber.beautifyNumber(delta, 2)}%)`, options.limits.delta) : '';
-        console.log(`${deepPrefix} ${chalk__default["default"].yellow(test)}${average ? ` [${chalk__default["default"].yellow(beautifyNumber.beautifyNumber(average))}]` : ''}: ${result}${deltaText}`);
+        console.log(`${deepPrefix} ${chalk__default["default"].yellow(name)}${average ? ` [${chalk__default["default"].yellow(beautifyNumber.beautifyNumber(average))}]` : ''}: ${result}${deltaText}`);
     }
-    if (test in object) {
-        object[test].success = Symbol('Success');
-        object[test].prev = object[test].value;
-        object[test].current = value;
-        object[test].prevMin = object[test].min;
-        object[test].prevMax = object[test].max;
-        object[test].highlight = highlight;
-        const { min, max } = object[test];
-        const averageValue = object[test].value = (object[test].value + value) / 2;
+    if (name in object) {
+        object[name].success = Symbol('Success');
+        object[name].prev = object[name].value;
+        object[name].current = value;
+        object[name].prevMin = object[name].min;
+        object[name].prevMax = object[name].max;
+        object[name].highlight = highlight;
+        const { min, max } = object[name];
+        const averageValue = object[name].value = (object[name].value + value) / 2;
         const currentMin = Math.min(min, value);
         const currentMax = Math.max(min, value);
         const delta = (currentMax - currentMin) / currentMax * 100;
         if (value < min) {
-            object[test].min = value;
+            object[name].min = value;
             if (logging) {
                 const level = ((min - value) * 10 / min) | 0;
                 let arrow = '<';
@@ -76,7 +80,7 @@ function test(test, callback, timeout = scope.scope) {
             }
         }
         else if (value > max) {
-            object[test].max = value;
+            object[name].max = value;
             if (logging) {
                 const level = ((value - max) * 10 / value) | 0;
                 let arrow = '<';
@@ -101,7 +105,7 @@ function test(test, callback, timeout = scope.scope) {
         }
     }
     else {
-        object[test] = {
+        object[name] = {
             min: value,
             max: value,
             prevMin: value,

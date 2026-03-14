@@ -35,6 +35,7 @@
 - **Zero-dependency** — Only requires `chalk` for terminal colors
 - **GC-aware** — Optional garbage collection control for accurate results
 - **Interactive** — Save results to JSON for future comparisons
+- **Flexible** — Support for `useBefore` and `useAfter` hooks for setup/teardown operations
 
 Use it to benchmark getters vs methods, optimize algorithms, or track performance regressions.
 
@@ -188,14 +189,17 @@ Do you want to save results? [Y/n]:
 
 Main function that wraps test suites. Accepts output filename, callback, and optional timeout/options.
 
-```ts
-perfocode(output: string, callback: Callback, timeout?: TimeoutOption)
+```
+perfocode(output: string, callback: Callback, timeout?: TimeoutOption): void
+perfocode(params: PerfocodeParams): void
 ```
 
-**Parameters:**
+**Arguments:**
 - `output` — Filename for saving results (without `.json` extension)
 - `callback` — Function containing `describe` and `test` calls
 - `timeout` — Timeout in ms (default: `300`) or options object
+
+Alternatively, pass a single object with `output`, `call` required fields, and other general options.
 
 **Example:**
 ```javascript
@@ -205,6 +209,23 @@ perfocode('benchmark', () => {
     test('slow', () => { /* ... */ })
   })
 }, 500)
+
+// Or using params object
+perfocode({
+  output: 'benchmark',
+  timeout: 500,
+  preventGC: true,
+  call() {
+    describe({
+      name: 'my tests',
+      useAfter: true,
+      call () {
+        test('fast', () => { /* ... */ })
+        test('slow', () => { /* ... */ })
+      }
+    })
+  },
+})
 ```
 
 ### describe
@@ -212,20 +233,33 @@ perfocode('benchmark', () => {
 
 Groups related tests together. Displays as a section in output.
 
-```typescript
+```
 describe(name: string, callback: Callback, timeout?: TimeoutOption)
+describe(params: DescribeParams)
 ```
 
-**Parameters:**
+**Arguments:**
 - `name` — Section name for display
 - `callback` — Function containing `test` calls
 - `timeout` — Timeout in ms or options object
+
+Alternatively, pass a single object with `name`, `call` required fields, and other general options.
 
 **Example:**
 ```javascript
 describe('array methods', () => {
   test('forEach', () => { /* ... */ })
   test('map', () => { /* ... */ })
+})
+
+// Or using params object
+describe({
+  name: 'array methods',
+  timeout: 1000,
+  logging: true,
+  call () {
+    test('forEach', () => { /* ... */ })
+  },
 })
 ```
 
@@ -234,14 +268,17 @@ describe('array methods', () => {
 
 Single performance test. Executes callback and measures operations per millisecond.
 
-```typescript
+```
 test(name: string, callback: Callback, options?: TestOptions | number)
+test(params: TestParams)
 ```
 
-**Parameters:**
+**Arguments:**
 - `name` — Test name for display
 - `callback` — Function to benchmark
-- `options` — Timeout in ms or options object with `timeout` and `highlight`
+- `options` — Timeout in ms or options object with `timeout`, `highlight`, `useBefore`, and `useAfter`
+
+Alternatively, pass a single object with `name`, `call` required fields, and other general options.
 
 **Example:**
 ```javascript
@@ -252,6 +289,39 @@ test('loop', () => {
 test('highlighted', () => {
   // Important test
 }, { timeout: 1000, highlight: true })
+
+// Or using params object
+test({
+  name: 'with setup',
+  useBefore: true,
+  timeout: 500,
+  test () {
+    const data = prepareData()
+    return () => data.process()
+  },
+})
+```
+
+**Using `useBefore` and `useAfter`:**
+
+These options allow pre- and post-execution hooks around the tested callback, useful for setup/teardown operations that shouldn't be included in the measurement.
+
+```javascript
+// useBefore: callback returns a function to execute in the benchmark loop
+test('with setup', () => {
+  const data = prepareData() // Setup (not measured)
+  return () => data.process() // Benchmark this
+}, { useBefore: true })
+
+// useAfter: cleanup function called after each benchmark iteration
+test('with cleanup', () => {
+  const data = prepareData()
+
+  return () => {
+    data.process()
+    return () => data.destroy() // Cleanup after each iteration
+  }
+}, { useBefore: true, useAfter: true })
 ```
 
 ## Configuration
@@ -288,7 +358,7 @@ PERFOCODE_TIMEOUT=1000 PERFOCODE_NO_ASK=true node index.js
 ### Options
 ###### [🏠︎](#index) / [Configuration](#configuration) / Options [↑](#environment-variables) [↓](#limits)
 
-Pass options as third argument to `perfocode`, `describe`, or `test`:
+Pass options as third argument to `perfocode`, `describe`, or `test`, or use the params object syntax:
 
 ```typescript
 interface Options {
@@ -299,17 +369,44 @@ interface Options {
   logging?: boolean       // Enable detailed logging
   limits?: Limits         // Custom limits
   columns?: string[]      // Custom column layout
+  
+  // Only for test()
+  highlight?: boolean     // Highlight this test in output
+  useBefore?: boolean     // Callback returns function to execute in benchmark loop
+  useAfter?: boolean      // Call returned function after each benchmark iteration
 }
 ```
 
 **Example:**
 ```javascript
+// Using options as third argument
 test('critical', () => {
   // Important benchmark
 }, {
   timeout: 1000,
-  throwError: true,
   highlight: true
+})
+
+// Using params object (all functions support this syntax)
+perfocode({
+  output: 'results',
+  call: () => {
+    describe('tests', () => {
+      test({
+        name: 'with hooks',
+        test: () => {
+          const setup = prepare()
+          return () => {
+            run(setup)
+            cleanup(setup)
+          }
+        },
+        useBefore: true,
+        useAfter: true
+      })
+    })
+  },
+  preventGC: true
 })
 ```
 
