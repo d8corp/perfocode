@@ -8,5 +8,5 @@ export interface TestParams<A extends boolean = false, B extends boolean = false
     name: string;
     call: Call<A, B>;
 }
-export declare function test<A extends boolean = false, B extends boolean = false>(name: string, call: Call<A, B>, timeout?: TestOptions | number): void;
+export declare function test<A extends boolean = false, B extends boolean = false>(name: string, call: Call<A, B>, timeout?: TestOptions<A, B> | number): void;
 export declare function test<A extends boolean = false, B extends boolean = false>(params: TestParams<A, B>): void;

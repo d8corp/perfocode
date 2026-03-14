@@ -2,6 +2,10 @@
 
 ## v1.6
 
+### v1.6.1 [![14.03.2026](https://img.shields.io/date/1773492032)](https://github.com/d8corp/perfocode/tree/v1.6.1)
+
+- Fixed type definition in `test` function: corrected `timeout` parameter type from `TestOptions` to `TestOptions<A, B>` to properly support generic type parameters.
+
 ### v1.6.0 [![14.03.2026](https://img.shields.io/date/1773485538)](https://github.com/d8corp/perfocode/tree/v1.6.0)
 
 - Improved measurement quality: excluded the time spent incrementing the counter in the benchmark loop from the measured time.

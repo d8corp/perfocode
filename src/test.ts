@@ -22,7 +22,7 @@ export interface TestParams<A extends boolean = false, B extends boolean = false
   call: Call<A, B>
 }
 
-export function test<A extends boolean = false, B extends boolean = false> (name: string, call: Call<A, B>, timeout?: TestOptions | number): void
+export function test<A extends boolean = false, B extends boolean = false> (name: string, call: Call<A, B>, timeout?: TestOptions<A, B> | number): void
 export function test<A extends boolean = false, B extends boolean = false> (params: TestParams<A, B>): void
 
 export function test<A extends boolean = false, B extends boolean = false> (
